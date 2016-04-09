@@ -1,11 +1,30 @@
+/* GENERAL */
+#banner {
+    background: #B31B1A;
+    position: relative;
+    margin-bottom: 35px;
+    padding: 5px;
+}
+
+#page-title {
+    margin-bottom: 30px;
+}
+
+#detailed-stats h3 {
+    margin-top: 5px;
+}
+
+.header-image {
+    max-height: 100px;
+}
 
 /* BAR CHART */
 .checklist-bar {
-    fill: green;
+    fill: #225B80;
 }
 
 .expected-bar {
-    fill: red;
+    fill: #B31B1A;
 }
 
 svg .bar {
@@ -26,7 +45,23 @@ svg .bar {
 .axis-label {
     text-anchor: middle;
     fill: black;
+    font-weight: bold;
     font-size: 15px;
+}
+
+svg {
+    position: relative;
+}
+
+.form-group {
+    display: inline-block;
+    position: absolute;
+    top: 0px;
+    left: 77px;
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: 2px;
+    z-index: 1;
 }
 
 /* TOOLTIPS */

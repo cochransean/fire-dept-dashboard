@@ -1,6 +1,6 @@
 
 // SVG drawing area
-var margin = {top: 40, right: 40, bottom: 40, left: 55};
+var margin = {top: 60, right: 40, bottom: 80, left: 55};
 
 var width = 600 - margin.left - margin.right,
 		height = 520 - margin.top - margin.bottom;
@@ -34,8 +34,39 @@ var xAxis = d3.svg.axis()
 	.scale(x)
 	.orient("bottom");
 
+// setup legend
+function setupLegend() {
+    var colors = ["#B31B1A", "#225B80"];
+    var text = ["Checklists Completed", "Checklists Expected"];
+    const LEGEND_ENTRY_WIDTH = 25;
+    const LEGEND_HORIZONTAL_OFFSET = 170;
+    const LEGEND_ENTRY_PADDING = 150;
+    var legendGroup = svg.append("g")
+        .attr("transform", "translate(" + LEGEND_HORIZONTAL_OFFSET + "," + -50 + ")");
+    legendGroup.selectAll("rect")
+        .data(colors)
+        .enter()
+        .append("rect")
+        .attr("x", function(d, i) { return i * (LEGEND_ENTRY_WIDTH + LEGEND_ENTRY_PADDING)})
+        .attr("y", 0)
+        .attr("width", LEGEND_ENTRY_WIDTH)
+        .attr("height", LEGEND_ENTRY_WIDTH)
+        .attr("fill", function(d) { return d });
+
+    legendGroup.selectAll("text")
+        .data(text)
+        .enter()
+        .append("text")
+        .attr("x", function(d, i) { return LEGEND_ENTRY_WIDTH + 5 + i * (LEGEND_ENTRY_WIDTH + LEGEND_ENTRY_PADDING)})
+        .attr("y", 17)
+        .text(function(d) { return d });
+}
+
+setupLegend();
+
+
 // global variables
-var data;
+var data, filteredData;
 var selectedOption = {
 	"modes": ["District", "Company"],
 	"mode": 0,
@@ -61,6 +92,23 @@ var xAxisLabel = svg.append("text")
     .attr("transform", "translate(" + width / 2 + "," + (height + 35) + ")")
     .attr("class", "axis axis-label");
 
+// setup interaction for select
+d3.select("#unit-select").on("change", function() {
+
+    var selectedValue = +d3.select("#unit-select").property("value");
+
+    // update stats before changing mode; always update table in district mode
+    selectedOption.mode = 0;
+    var statParameters = { District: selectedValue };
+    updateStats(statParameters);
+
+    // update selected option; set to district for all, company for any specific district selection
+    selectedOption.mode = selectedValue == 0 ? 0: 1;
+    selectedOption.selectedUnit = selectedValue == 0 ? 0: selectedValue;
+
+    updateVisualization();
+});
+
 // Load CSV file
 function loadData() {
 	d3.csv("data/dashboard-mock-data.csv", function(error, csv) {
@@ -72,7 +120,7 @@ function loadData() {
 
 		// Store csv data in global variable
 		data = csv.map(function(value) {
-			var fields = ["District", "Structural", "Vehicle", "Other", "Checklists Completed"];
+			var fields = ["District", "Structural", "Vehicle", "Other", "Checklists-Completed"];
 			fields.forEach(function(field) {
 				value[field] = +value[field];
 			});
@@ -82,6 +130,7 @@ function loadData() {
 		console.log(data);
 
 		updateVisualization();
+        updateStats();
 
 	});
 }
@@ -90,20 +139,15 @@ function loadData() {
 // Render visualization
 function updateVisualization() {
 
-	// filter out unwanted years
-	var filteredData = data.filter(filterData);
+	// filter out unwanted units
+	filteredData = data.filter(filterData);
 	console.log(filteredData);
 
     // get option selected
     var option = selectedOption.modes[selectedOption.mode];
 
-	var xDomain = filteredData.map(function(value) {
-        return value[option];
-    });
-
     // track current height of each bar to allow stacking
     var barHeights = {};
-    console.log(barHeights);
 
     // update scales
 	x.domain(filteredData.map(function(value) {
@@ -114,14 +158,12 @@ function updateVisualization() {
         }
 
         // while updating scale, update totals by unit to enable stacking
-        barHeights[value[option]].completed += value["Checklists Completed"];
-        barHeights[value[option]].delta += value.Structural + value.Vehicle + value.Other - value["Checklists Completed"];
+        barHeights[value[option]].completed += value["Checklists-Completed"];
+        barHeights[value[option]].delta += value.Structural + value.Vehicle + value.Other - value["Checklists-Completed"];
 
         return value[option];
     }));
     y.domain([0, findMax(barHeights)]);
-
-    console.log(barHeights);
 
     // select bar for expected checklists not completed
     var expectedBar = svg.selectAll(".expected-bar")
@@ -131,6 +173,7 @@ function updateVisualization() {
         .append("rect")
         .attr("class", "bar expected-bar")
         .on("click", nextLevel)
+        .on("click", updateStats)
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
@@ -142,7 +185,7 @@ function updateVisualization() {
         .attr("width", x.rangeBand())
         .attr("y", function(d) {
 
-            var currentDelta = d.Structural + d.Vehicle + d.Other - d["Checklists Completed"];
+            var currentDelta = d.Structural + d.Vehicle + d.Other - d["Checklists-Completed"];
 
             // store current height of bar
             var currentTotalHeight = barHeights[d[option]].completed + barHeights[d[option]].delta;
@@ -155,7 +198,7 @@ function updateVisualization() {
             return y(currentTotalHeight);
         })
         .attr("height", function(d) {
-            return height - y(d.Structural + d.Vehicle + d.Other - d["Checklists Completed"]);
+            return height - y(d.Structural + d.Vehicle + d.Other - d["Checklists-Completed"]);
         })
         .style("opacity", 1);
 
@@ -170,6 +213,7 @@ function updateVisualization() {
         .append("rect")
         .attr("class", "bar checklist-bar")
         .on("click", nextLevel)
+        .on("click", updateStats)
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
@@ -186,11 +230,11 @@ function updateVisualization() {
             var currentHeight = barHeights[d[option]].completed;
 
             // decrement height of bar for next item plotted
-            barHeights[d[option]].completed -= d["Checklists Completed"];
+            barHeights[d[option]].completed -= d["Checklists-Completed"];
 
             return y(currentHeight);
         })
-        .attr("height", function(d) { return height - y(d["Checklists Completed"]); })
+        .attr("height", function(d) { return height - y(d["Checklists-Completed"]); })
         .style("opacity", 1);
 
     checklistBar.exit()
@@ -200,18 +244,47 @@ function updateVisualization() {
 	xAxisGroup
 		.transition()
 		.duration(800)
-		.call(xAxis);
+		.call(xAxis)
+        .selectAll("text")
+            .style("text-anchor", function() {
+                if (selectedOption.mode == 0) {
+                    return "middle"
+                }
 
+                // for rotation
+                else {
+                    return "end"
+                }
+            })
+            .attr("transform", function() {
+                if (selectedOption.mode == 0) {
+                    return "rotate(0)"
+                }
+                else {
 
+                    // only rotate for companies on x axis
+                    return "rotate(-45)"
+                }
+            });
 
 	yAxisGroup
 		.transition()
 		.duration(800)
 		.call(yAxis);
 
-    // update axis label
+    // update axes
     yAxisLabel.text("Quantity");
-    xAxisLabel.text(function(){ return selectedOption.modes[selectedOption.mode] });
+    xAxisLabel.text(function(){ return selectedOption.modes[selectedOption.mode] })
+        .attr("y", function() {
+            if (selectedOption.mode == 0) {
+                return 0
+            }
+            else {
+
+                // give extra space for labels if displaying companies on x axis
+                return 40
+            }
+        });
 
 	// HELPER FUNCTIONS
     // filters out items not in currently selected date range
@@ -228,8 +301,6 @@ function updateVisualization() {
 		else if (selectedOption.modes[selectedOption.mode] === "Company") {
 			return value.District === selectedOption.selectedUnit;
 		}
-
-        // TODO filter to one company if bottom of hierarchy
 	}
 
     function findMax(dataObject) {
@@ -254,8 +325,6 @@ function updateVisualization() {
             selectedOption.selectedUnit = d.Company;
         }
 
-        // TODO else must have selected individual company
-
         // advance to next level in the hierarchy
         selectedOption.mode = (selectedOption.mode + 1) % 2;
         updateVisualization();
@@ -263,10 +332,11 @@ function updateVisualization() {
 
 }
 
-// show details tooltip
+
+// show detailed tooltip
 function showToolTip(d) {
 
-	var fieldsForMessage = ["Structural", "Vehicle", "Other", "Checklists Completed"];
+	var fieldsForMessage = ["Structural", "Vehicle", "Other", "Checklists-Completed"];
 
     // build message
 	var message = "<div id='tooltip-header' class='text-center'><h4>" + d.Company + "</h4></div>" +
@@ -277,4 +347,84 @@ function showToolTip(d) {
     message += "</tbody></table></div>";
 
     return message
+}
+
+// update detailed statistics
+function updateStats(d) {
+
+    var fields = ["Structural", "Vehicle", "Other", "Checklists-Completed"];
+    var totals = {"Structural": 0, "Vehicle": 0, "Other": 0, "Checklists-Completed": 0};
+
+    // determine mode
+    var mode = selectedOption.modes[selectedOption.mode];
+
+    // get unit clicked on
+    if (d) {
+        var unitClicked = mode == "District" ? d.District: d.Company;
+    }
+
+    // if in district mode and no district selected, display aggregate data
+    if ((mode == "District" && !unitClicked) || d.District == 0) {
+        d3.select("#unit-name").text("Boston Fire Department Totals");
+
+        getTotals(data);
+
+        fields.forEach(function(field) {
+            d3.select("#" + field).text(totals[field]);
+        });
+
+        d3.select("#total-fires").text(totalFires);
+        d3.select("#completion-rate").text(completionRate);
+
+    }
+
+    // if in district mode and district clicked, display total district data
+    else if (mode == "District") {
+        d3.select("#unit-name").text("District " + unitClicked);
+        console.log("district branch");
+
+        // filter data further by district
+        var districtStats = data.filter(function(value) {
+            console.log(value.District == unitClicked);
+            return value.District == unitClicked;
+        });
+
+        console.log(unitClicked);
+        console.log(districtStats);
+
+        getTotals(districtStats);
+
+        fields.forEach(function(field) {
+            d3.select("#" + field).text(totals[field]);
+        });
+
+        d3.select("#total-fires").text(totalFires);
+        d3.select("#completion-rate").text(completionRate);
+
+    }
+
+    else {
+        d3.select("#unit-name").text(unitClicked);
+        fields.forEach(function(field) {
+            d3.select("#" + field).text(d[field]);
+        });
+    }
+
+    function getTotals(dataArray) {
+        dataArray.forEach(function(company) {
+            fields.forEach(function(field) {
+                totals[field] += company[field];
+            });
+        });
+    }
+
+    function totalFires() {
+        return totals.Structural + totals.Vehicle + totals.Other;
+    }
+
+    function completionRate() {
+        var total = totalFires();
+        var showAsPercent = d3.format(",%");
+        return showAsPercent(totals["Checklists-Completed"] / total)
+    }
 }
