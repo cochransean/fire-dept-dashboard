@@ -19,61 +19,62 @@
 	<div class="container">
 
 		<div class="row">
-
-			<div class="text-center">
-
-				<!-- Parent container for the visualization -->
-				<div class="col-md-6 col-sm-12 col-xs-12" id="chart-area">
-                    <form class="form-horizontal">
-                        <div class="form-group">
-                            <label for="unit-select" class="col-xs-5 control-label">District</label>
-                            <div class="col-xs-7">
-                                <select class="form-control" id="unit-select">
-                                    <option value="0">All</option>
-                                    <option value="1">1</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="6">6</option>
-                                    <option value="11">11</option>
-                                </select>
-                            </div>
+            <div class="col-md-6 col-sm-12 col-xs-12">
+                <div class="row">
+                    <div id="control-legend">
+                        <div id="controls" class="col-md-4">
+                            <form class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="unit-select" class="col-xs-5 control-label">District</label>
+                                    <div class="col-xs-7">
+                                        <select class="form-control" id="unit-select">
+                                            <option value="0">All</option>
+                                            <option value="1">1</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="6">6</option>
+                                            <option value="11">11</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                        <div id="legend" class="col-md-8"></div>
+                    </div>
                 </div>
-                <div class="col-md-4 col-md-offset-1 col-sm-12 col-xs-12" id="detailed-stats">
-                    <h3 id="unit-name" class="text-center"></h3>
-                    <table class="table">
-                        <tbody>
-                        <tr>
-                            <td>Total Fires</td>
-                            <td class="data-point" id="total-fires"></td>
-                        </tr>
-                        <tr>
-                            <td>Structural Fires</td>
-                            <td class="data-point" id="Structural"></td>
-                        </tr>
-                        <tr>
-                            <td>Vehicle Fires</td>
-                            <td class="data-point" id="Vehicle"></td>
-                        </tr>
-                        <tr>
-                            <td>Other Fires</td>
-                            <td class="data-point" id="Other"></td>
-                        </tr>
-                        <tr>
-                            <td>Checklists Completed</td>
-                            <td class="data-point" id="Checklists-Completed"></td>
-                        </tr>
-                        <tr>
-                            <td>Checklist Completion Rate</td>
-                            <td class="data-point" id="completion-rate"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-			</div>
-
+                <div id="chart-area"></div>
+            </div>
+            <div class="col-md-4 col-md-offset-1 col-sm-12 col-xs-12" id="detailed-stats">
+                <h3 id="unit-name" class="text-center"></h3>
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <td>Total Fires</td>
+                        <td class="data-point" id="total-fires"></td>
+                    </tr>
+                    <tr>
+                        <td>Structural Fires</td>
+                        <td class="data-point" id="Structural"></td>
+                    </tr>
+                    <tr>
+                        <td>Vehicle Fires</td>
+                        <td class="data-point" id="Vehicle"></td>
+                    </tr>
+                    <tr>
+                        <td>Other Fires</td>
+                        <td class="data-point" id="Other"></td>
+                    </tr>
+                    <tr>
+                        <td>Checklists Completed</td>
+                        <td class="data-point" id="Checklists-Completed"></td>
+                    </tr>
+                    <tr>
+                        <td>Checklist Completion Rate</td>
+                        <td class="data-point" id="completion-rate"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
 		</div>
 	</div>
 

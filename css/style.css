@@ -49,16 +49,24 @@ svg .bar {
     font-size: 15px;
 }
 
-svg {
+#control-legend {
     position: relative;
+    top: 0;
+    left: 77px;
+}
+
+.control-label {
+    padding-top: 6px;
+}
+
+#legend {
+    min-width: 350px;
+    padding-left: 0;
 }
 
 .form-group {
-    display: inline-block;
-    position: absolute;
-    top: 0px;
-    left: 77px;
     border: 2px solid black;
+    width: 190px;
     border-radius: 5px;
     padding: 2px;
     z-index: 1;
@@ -95,7 +103,7 @@ svg {
 }
 
 .company-tip table {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 #tooltip-header h4{

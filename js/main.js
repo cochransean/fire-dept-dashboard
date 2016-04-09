@@ -1,9 +1,10 @@
 
 // SVG drawing area
-var margin = {top: 60, right: 40, bottom: 80, left: 55};
+var margin = {top: 20, right: 40, bottom: 80, left: 55};
 
-var width = 600 - margin.left - margin.right,
-		height = 520 - margin.top - margin.bottom;
+var divWidth = $("#chart-area").width();
+var width =  divWidth - margin.left - margin.right,
+		height = 0.87 * divWidth - margin.top - margin.bottom;
 
 var svg = d3.select("#chart-area").append("svg")
 		.attr("width", width + margin.left + margin.right)
@@ -39,10 +40,14 @@ function setupLegend() {
     var colors = ["#B31B1A", "#225B80"];
     var text = ["Checklists Completed", "Checklists Expected"];
     const LEGEND_ENTRY_WIDTH = 25;
-    const LEGEND_HORIZONTAL_OFFSET = 170;
+    const LEGEND_HORIZONTAL_OFFSET = 0;
+    const LEGEND_VERTICAL_OFFSET = 7;
     const LEGEND_ENTRY_PADDING = 150;
-    var legendGroup = svg.append("g")
-        .attr("transform", "translate(" + LEGEND_HORIZONTAL_OFFSET + "," + -50 + ")");
+    var legend = d3.select("#legend").append("svg")
+        .attr("width", 350)
+        .attr("height", 30);
+    var legendGroup = legend.append("g")
+        .attr("transform", "translate(" + LEGEND_HORIZONTAL_OFFSET + "," + LEGEND_VERTICAL_OFFSET + ")");
     legendGroup.selectAll("rect")
         .data(colors)
         .enter()
