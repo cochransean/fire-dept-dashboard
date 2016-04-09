@@ -408,6 +408,7 @@ function updateStats(d) {
     }
 
     function colorByRate() {
+        console.log(completionRate);
         if (completionRate >= .90) {
             return "rgba(0, 128, 28, 0.82)"
         }
@@ -415,7 +416,7 @@ function updateStats(d) {
             return "yellow"
         }
         else {
-            return "B31B1A"
+            return "#B31B1A"
         }
 
     }
