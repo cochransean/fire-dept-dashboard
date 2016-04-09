@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>CS171 - HW 5</title>
+	<title>Boston Firestat</title>
 
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/style.css">
@@ -12,67 +12,21 @@
 <body>
 
 	<div class="container" id="pageTitle">
-		<img src="img/WorldCupStadium.jpg" id="header-image" class="img-responsive">
-		<div class="overlay-text">
-			<h1>FIFA World Cup<sup>TM</sup></h1>
-			<h2>All Time Statistics</h2>
+		<div class="text-center">
+			<h1>Boston Firestat</h1>
 		</div>
 	</div>
 
 	<div class="container">
 
-
-
-		<!-- Select box to choose data type for y-axis -->
-		<form class="form-inline">
-			<div class="form-group">
-				<label for="compare-by">Compare By</label>
-				<select class="form-control" id="compare-by">
-					<option value="GOALS">Number of Goals</option>
-					<option value="AVERAGE_ATTENDANCE">Average Attendance</option>
-					<option value="AVERAGE_GOALS">Average Goals</option>
-					<option value="MATCHES">Number of Matches</option>
-					<option value="TEAMS">Number of Teams</option>
-				</select>
-			</div>
-		</form>
-
 		<div class="row">
 
-			<!-- Parent container for the visualization -->
-			<div class="col-md-6 col-sm-12 col-xs-12" id="chart-area"></div>
+			<div class="text-center">
 
-			<div class="col-md-5 col-md-offset-1 col-sm-12 col-xs-12" id="editionInfo">
-				<h3 id="EDITION" class="text-center"></h3>
-				<table class="table">
-					<tbody>
-						<tr>
-							<td>Winner</td>
-							<td class="data-point" id="WINNER"></td>
-						</tr>
-						<tr>
-							<td>Goals</td>
-							<td class="data-point" id="GOALS"></td>
-						</tr>
-						<tr>
-							<td>Average Goals</td>
-							<td class="data-point" id="AVERAGE_GOALS"></td>
-						</tr>
-						<tr>
-							<td>Matches</td>
-							<td class="data-point" id="MATCHES"></td>
-						</tr>
-						<tr>
-							<td>Teams</td>
-							<td class="data-point" id="TEAMS"></td>
-						</tr>
-						<tr>
-							<td>Average Attendance</td>
-							<td class="data-point" id="AVERAGE_ATTENDANCE"></td>
-						</tr>
-					</tbody>
-				</table>
+				<!-- Parent container for the visualization -->
+				<div class="col-xs-12" id="chart-area"></div>
 			</div>
+
 		</div>
 	</div>
 

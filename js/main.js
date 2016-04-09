@@ -1,6 +1,6 @@
 
 // SVG drawing area
-var margin = {top: 40, right: 40, bottom: 40, left: 40};
+var margin = {top: 40, right: 40, bottom: 40, left: 55};
 
 var width = 600 - margin.left - margin.right,
 		height = 520 - margin.top - margin.bottom;
@@ -51,6 +51,15 @@ var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return showToolTip
 // offset to allow clicking on circle
 tip.offset([-10, 0]);
 svg.call(tip);
+
+// append axis labels
+var yAxisLabel = svg.append("text")
+    .attr("transform", "translate(" + -40 + "," + height / 2 + ") rotate(90)")
+    .attr("class", "axis axis-label");
+
+var xAxisLabel = svg.append("text")
+    .attr("transform", "translate(" + width / 2 + "," + (height + 35) + ")")
+    .attr("class", "axis axis-label");
 
 // Load CSV file
 function loadData() {
@@ -121,7 +130,9 @@ function updateVisualization() {
     expectedBar.enter()
         .append("rect")
         .attr("class", "bar expected-bar")
-        .on("click", nextLevel);
+        .on("click", nextLevel)
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
 
     expectedBar
         .style("opacity", 0.5)
@@ -158,7 +169,9 @@ function updateVisualization() {
     checklistBar.enter()
         .append("rect")
         .attr("class", "bar checklist-bar")
-        .on("click", nextLevel);
+        .on("click", nextLevel)
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
 
     // update as required
     checklistBar
@@ -189,10 +202,16 @@ function updateVisualization() {
 		.duration(800)
 		.call(xAxis);
 
+
+
 	yAxisGroup
 		.transition()
 		.duration(800)
 		.call(yAxis);
+
+    // update axis label
+    yAxisLabel.text("Quantity");
+    xAxisLabel.text(function(){ return selectedOption.modes[selectedOption.mode] });
 
 	// HELPER FUNCTIONS
     // filters out items not in currently selected date range
@@ -247,21 +266,15 @@ function updateVisualization() {
 // show details tooltip
 function showToolTip(d) {
 
-	var prettyPrintUnits = {
-		"EDITION": "Edition",
-		"YEAR": "Year",
-		"LOCATION": "Location",
-		"WINNER": "Winner",
-		"TEAMS": "Teams",
-		"MATCHES": "Matches",
-		"GOALS": "Goals",
-		"AVERAGE_GOALS": "Average Goals",
-		"AVERAGE_ATTENDANCE": "Average Attendance"
-	};
+	var fieldsForMessage = ["Structural", "Vehicle", "Other", "Checklists Completed"];
 
-	// build message
-	var message = "<strong>" + d.EDITION + "</strong>" +
-		"<p>" + d[selectedOption] + " " + prettyPrintUnits[selectedOption] + "</p>";
+    // build message
+	var message = "<div id='tooltip-header' class='text-center'><h4>" + d.Company + "</h4></div>" +
+        "<div class='company-tip'><table class='table'><tbody>";
+    fieldsForMessage.forEach(function(field) {
+        message += "<tr><td>" + field + "</td>" + "<td>" + d[field] + "</td></tr>";
+    });
+    message += "</tbody></table></div>";
 
-	return message
+    return message
 }
