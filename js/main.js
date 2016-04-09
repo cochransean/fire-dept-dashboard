@@ -81,12 +81,16 @@ var selectedOption = {
 // Initialize data
 loadData();
 
-// setup tooltip
-var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return showToolTip(d) });
+// only do tooltips on non-mobile devices
+if ($( window ).width() > 768) {
 
-// offset to allow clicking on circle
-tip.offset([-10, 0]);
-svg.call(tip);
+    // setup tooltip
+    var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return showToolTip(d) });
+
+    // offset to allow clicking on circle
+    tip.offset([-10, 0]);
+    svg.call(tip);
+}
 
 // append axis labels
 var yAxisLabel = svg.append("text")
@@ -178,8 +182,12 @@ function updateVisualization() {
         .append("rect")
         .attr("class", "bar expected-bar")
         .on("click", updateStats)
-        .on('mouseover', tip.show)
-        .on('mouseout', tip.hide);
+        .on('mouseover', function(d) {
+            if (tip) { tip.show(d); }
+        })
+        .on('mouseout', function(d) {
+            if (tip) { tip.hide(d); }
+        });
 
     expectedBar
         .style("opacity", 0.5)
@@ -196,8 +204,6 @@ function updateVisualization() {
 
             // decrement height of bar for next item plotted
             barHeights[d[option]].delta -= currentDelta;
-
-            console.log(y(currentTotalHeight));
 
             return y(currentTotalHeight);
         })
@@ -217,8 +223,12 @@ function updateVisualization() {
         .append("rect")
         .attr("class", "bar checklist-bar")
         .on("click", updateStats)
-        .on('mouseover', tip.show)
-        .on('mouseout', tip.hide);
+        .on('mouseover', function(d) {
+            if (tip) { tip.show(d); }
+        })
+        .on('mouseout', function(d) {
+            if (tip) { tip.hide(d); }
+        });
 
     // update as required
     checklistBar
@@ -293,8 +303,6 @@ function updateVisualization() {
     // filters out items not in currently selected date range
 	function filterData(value) {
 
-		console.log(selectedOption.modes[selectedOption.mode]);
-
 		// return all items if district is selected
 		if (selectedOption.modes[selectedOption.mode] === "District") {
 			return true
@@ -313,7 +321,6 @@ function updateVisualization() {
             var currentValue = dataObject[key].completed + dataObject[key].delta;
             max = currentValue > max ? currentValue : max;
         });
-        console.log(max);
         return max
     }
 
@@ -362,7 +369,6 @@ function updateStats(d) {
 
         // filter data further by district
         var districtStats = data.filter(function(value) {
-            console.log(value.District == unitClicked);
             return value.District == unitClicked;
         });
 
@@ -402,7 +408,6 @@ function updateStats(d) {
     }
 
     function colorByRate() {
-        console.log(completionRate);
         if (completionRate >= .90) {
             return "rgba(0, 128, 28, 0.82)"
         }
