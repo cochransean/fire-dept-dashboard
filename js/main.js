@@ -38,7 +38,7 @@ var xAxis = d3.svg.axis()
 // setup legend
 function setupLegend() {
     var colors = ["#B31B1A", "#225B80"];
-    var text = ["Checklists Completed", "Checklists Expected"];
+    var text = ["Checklists Completed", "Expected"];
     const LEGEND_ENTRY_WIDTH = 25;
     const LEGEND_HORIZONTAL_OFFSET = 0;
     const LEGEND_VERTICAL_OFFSET = 7;
