@@ -35,7 +35,7 @@ var xAxis = d3.svg.axis()
 	.scale(x)
 	.orient("bottom");
 
-// setup legend
+// setup legend TEST UPDATE
 function setupLegend() {
     var colors = ["#B31B1A", "#225B80"];
     var text = ["Checklists Completed", "Expected"];
