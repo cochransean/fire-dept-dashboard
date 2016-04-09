@@ -177,7 +177,6 @@ function updateVisualization() {
     expectedBar.enter()
         .append("rect")
         .attr("class", "bar expected-bar")
-        .on("click", nextLevel)
         .on("click", updateStats)
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
@@ -217,7 +216,6 @@ function updateVisualization() {
     checklistBar.enter()
         .append("rect")
         .attr("class", "bar checklist-bar")
-        .on("click", nextLevel)
         .on("click", updateStats)
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
@@ -319,22 +317,6 @@ function updateVisualization() {
         return max
     }
 
-    function nextLevel(d) {
-
-        // update unit to reflect the next level down the hierarchy and the item that was clicked on
-        if (selectedOption.modes[selectedOption.mode] === "District") {
-            selectedOption.selectedUnit = d.District;
-        }
-
-        else if (selectedOption.modes[selectedOption.mode] === "Company") {
-            selectedOption.selectedUnit = d.Company;
-        }
-
-        // advance to next level in the hierarchy
-        selectedOption.mode = (selectedOption.mode + 1) % 2;
-        updateVisualization();
-    }
-
 }
 
 
@@ -368,25 +350,15 @@ function updateStats(d) {
         var unitClicked = mode == "District" ? d.District: d.Company;
     }
 
-    // if in district mode and no district selected, display aggregate data
+    // get all data
     if ((mode == "District" && !unitClicked) || d.District == 0) {
         d3.select("#unit-name").text("Boston Fire Department Totals");
-
         getTotals(data);
-
-        fields.forEach(function(field) {
-            d3.select("#" + field).text(totals[field]);
-        });
-
-        d3.select("#total-fires").text(totalFires);
-        d3.select("#completion-rate").text(completionRate);
-
     }
 
-    // if in district mode and district clicked, display total district data
+    // get selected district data
     else if (mode == "District") {
         d3.select("#unit-name").text("District " + unitClicked);
-        console.log("district branch");
 
         // filter data further by district
         var districtStats = data.filter(function(value) {
@@ -394,26 +366,23 @@ function updateStats(d) {
             return value.District == unitClicked;
         });
 
-        console.log(unitClicked);
-        console.log(districtStats);
-
         getTotals(districtStats);
-
-        fields.forEach(function(field) {
-            d3.select("#" + field).text(totals[field]);
-        });
-
-        d3.select("#total-fires").text(totalFires);
-        d3.select("#completion-rate").text(completionRate);
-
     }
 
+    // get company data
     else {
         d3.select("#unit-name").text(unitClicked);
-        fields.forEach(function(field) {
-            d3.select("#" + field).text(d[field]);
-        });
+        getTotals([d]);
     }
+
+    // use data to update fields
+    fields.forEach(function(field) {
+        d3.select("#" + field).text(totals[field]);
+    });
+    d3.select("#total-fires").text(totalFires);
+    var completionRate = totals["Checklists-Completed"] / totalFires();
+    d3.select("#completion-rate").text(formatAsPercent(completionRate))
+        .style("background", colorByRate());
 
     function getTotals(dataArray) {
         dataArray.forEach(function(company) {
@@ -427,9 +396,22 @@ function updateStats(d) {
         return totals.Structural + totals.Vehicle + totals.Other;
     }
 
-    function completionRate() {
-        var total = totalFires();
+    function formatAsPercent(number) {
         var showAsPercent = d3.format(",%");
-        return showAsPercent(totals["Checklists-Completed"] / total)
+        return showAsPercent(number)
+    }
+
+    function colorByRate() {
+        console.log(completionRate);
+        if (completionRate >= .90) {
+            return "rgba(0, 128, 28, 0.82)"
+        }
+        else if (completionRate < .90 && completionRate > .70) {
+            return "yellow"
+        }
+        else {
+            return "B31B1A"
+        }
+
     }
 }
