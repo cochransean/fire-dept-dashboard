@@ -41,7 +41,7 @@ function setupLegend() {
     var text = ["Checklists Completed", "Expected"];
     const LEGEND_ENTRY_WIDTH = 25;
     const LEGEND_HORIZONTAL_OFFSET = 0;
-    const LEGEND_VERTICAL_OFFSET = 7;
+    const LEGEND_VERTICAL_OFFSET = 12;
     const LEGEND_ENTRY_PADDING = 150;
     var legend = d3.select("#legend").append("svg")
         .attr("width", 350)
@@ -63,7 +63,7 @@ function setupLegend() {
         .enter()
         .append("text")
         .attr("x", function(d, i) { return LEGEND_ENTRY_WIDTH + 5 + i * (LEGEND_ENTRY_WIDTH + LEGEND_ENTRY_PADDING)})
-        .attr("y", 17)
+        .attr("y", 15)
         .text(function(d) { return d });
 }
 
